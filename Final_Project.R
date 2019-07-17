@@ -5,8 +5,10 @@ library(janitor)
 summarySCC_PM25 <- clean_names(summarySCC_PM25)
 Source_Classification_Code <- clean_names(Source_Classification_Code)
 #Question 1 Have total emissions from PM2.5 decreased in the United States from 1999 to 2008? 
+options(scipen = 999)
 by_year <- summarySCC_PM25 %>% group_by(year) %>% summarise(total = sum(emissions))
 by_year$year <- as.factor(by_year$year)
+
 
 barplot(by_year$total, main="Total Emissions from PM2.5 from 1999-2008",  names.arg=c("1999", "2002", "2005", "2008"))
 
@@ -27,6 +29,7 @@ library(ggplot2)
 
 baltimore_type <- summarySCC_PM25 %>% filter(fips == "24510") %>% group_by(year, type)
 
+options(scipen = 999)
 b <-ggplot(baltimore_type, aes(factor(year), emissions)) + geom_bar(stat = "identity", fill = "steelblue") + theme_minimal() + labs(title = "PM2.5 in Baltimore (1999-2008) by type", x = "Year") + facet_wrap(~type)
 b
 
@@ -34,3 +37,11 @@ b
 #Question 4 Across the United States, how have emissions from coal combustion-related 
 #sources changed from 1999–2008?
 coal_ids <- filter(Source_Classification_Code, ei_sector == "Fuel Comb - Electric Generation - Coal")
+coal <- filter(summarySCC_PM25, scc %in% coal_ids$scc)
+
+coal_by_year <- coal %>% group_by(year) %>% summarise(total = sum(emissions))
+
+options(scipen = 999)
+c <- ggplot(coal_by_year, aes(factor(year), total)) + geom_bar(stat = "identity", fill = "chartreuse") + labs(title = "PM2.5 from Coal in the US from (1999 - 2008)", x = "Year", y = "Total Coal Emissions")
+c
+#Question 5 How have emissions from motor vehicle sources changed from 1999–2008 in Baltimore City?
