@@ -45,3 +45,27 @@ options(scipen = 999)
 c <- ggplot(coal_by_year, aes(factor(year), total)) + geom_bar(stat = "identity", fill = "chartreuse") + labs(title = "PM2.5 from Coal in the US from (1999 - 2008)", x = "Year", y = "Total Coal Emissions")
 c
 #Question 5 How have emissions from motor vehicle sources changed from 1999–2008 in Baltimore City?
+library(stringr)
+motor_vehciles_scc <- dplyr::filter(Source_Classification_Code, str_detect(scc_level_two, 'Vehicles'))
+
+baltimore_motor_vehicle <- filter(baltimore, scc %in% motor_vehciles_scc$scc)
+
+motor_by_year <- baltimore_motor_vehicle %>% group_by(year) %>% summarise(total = sum(emissions))
+
+options(scipen = 999)
+m <- ggplot(motor_by_year, aes(factor(year), total)) + geom_bar(stat = "identity", fill = "rosybrown") + labs(title = "Motor Vehicle Pollution in Baltimore (1999 - 2008)", x = "Year", y = "Total Vehicle Emissions") + ylim(0,  5000)
+m
+
+#Question 6 Compare emissions from motor vehicle sources in Baltimore City with emissions from motor vehicle 
+#sources in Los Angeles County, California (fips=="06037"). Which city has seen greater changes over time in 
+#motor vehicle emissions?
+LA <- filter(summarySCC_PM25, fips == "06037")
+LA_motor_vehicle <- filter(LA, scc %in% motor_vehciles_scc$scc)
+
+LAmotor_by_year <- LA_motor_vehicle %>% group_by(year) %>% summarise(total = sum(emissions))
+
+options(scipen = 999)
+LAm <- ggplot(LAmotor_by_year, aes(factor(year), total)) + geom_bar(stat = "identity", fill = "darkblue") + labs(title = "Motor Vehicle Pollution in Los Angelos County(1999 - 2008)", x = "Year", y = "Total Vehicle Emissions") + ylim(0,5000 )
+LAm
+
+grid.arrange(m, LAm, nrow = 1)
